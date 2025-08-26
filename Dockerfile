@@ -2,9 +2,9 @@
 # Stage 1: Build the Vite app
 FROM node:20 AS build
 WORKDIR /app
-COPY package*.json ./
+COPY Trend/package*.json ./
 RUN npm ci
-COPY . .
+COPY Trend/. .
 RUN npm run build
 
 # Stage 2: Serve with Nginx
