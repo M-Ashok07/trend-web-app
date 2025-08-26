@@ -27,25 +27,16 @@ pipeline {
     }
 
     stage('Build Image') {
-      steps {
+    steps {
         script {
-          def tag = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-          env.IMAGE_TAG = tag
+            env.IMAGE_TAG = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
         }
         sh '''
-          docker build -t $DOCKER_IMAGE:$IMAGE_TAG -t $DOCKER_IMAGE:latest .
+            docker build -f Dockerfile -t $DOCKER_IMAGE:$IMAGE_TAG -t $DOCKER_IMAGE:latest .
         '''
-      }
     }
+}
 
-    stage('Push Image') {
-      steps {
-        sh '''
-          docker push $DOCKER_IMAGE:$IMAGE_TAG
-          docker push $DOCKER_IMAGE:latest
-        '''
-      }
-    }
 
     stage('Set kubeconfig') {
       steps {
