@@ -10,6 +10,7 @@ pipeline {
 
     stages {
 
+        // Stage 1: Checkout code from GitHub
         stage('Checkout SCM') {
             steps {
                 git branch: 'main',
@@ -18,6 +19,7 @@ pipeline {
             }
         }
 
+        // Stage 2: Set Image Tag from Git Commit
         stage('Set Image Tag') {
             steps {
                 script {
@@ -27,6 +29,7 @@ pipeline {
             }
         }
 
+        // Stage 3: Docker Login
         stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', 
@@ -37,6 +40,7 @@ pipeline {
             }
         }
 
+        // Stage 4: Build Docker Image
         stage('Build Image') {
             steps {
                 sh """
@@ -46,6 +50,7 @@ pipeline {
             }
         }
 
+        // Stage 5: Push Docker Image to Docker Hub
         stage('Push Image') {
             steps {
                 sh """
@@ -55,23 +60,27 @@ pipeline {
             }
         }
 
+        // Stage 6: Deploy to EKS
         stage('Deploy to EKS') {
-    steps {
-        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-login']]) {
-            sh """
-                aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER} --alias ${EKS_CLUSTER}
-                export KUBECONFIG=$HOME/.kube/config
-                kubectl get nodes
-                kubectl apply -f k8s/deployment.yaml --validate=false
-                kubectl apply -f k8s/service.yaml --validate=false
-            """
+            steps {
+                // Make sure the AWS credential ID matches exactly ('aws login')
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws login']]) {
+                    sh '''
+                        aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER} --alias ${EKS_CLUSTER}
+                        export KUBECONFIG=$HOME/.kube/config
+                        kubectl get nodes
+                        kubectl apply -f k8s/deployment.yaml --validate=false
+                        kubectl apply -f k8s/service.yaml --validate=false
+                    '''
+                }
+            }
         }
+
     }
-}
 
     post {
         always {
-            cleanWs()
+            cleanWs()  // Clean workspace after build
         }
     }
 }
