@@ -64,7 +64,7 @@ pipeline {
         stage('Deploy to EKS') {
             steps {
                 // Make sure the AWS credential ID matches exactly ('aws login')
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws login']]) {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-login']]) {
                     sh '''
                         aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER} --alias ${EKS_CLUSTER}
                         export KUBECONFIG=$HOME/.kube/config
