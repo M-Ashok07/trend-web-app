@@ -63,7 +63,7 @@ pipeline {
         // Stage 6: Deploy to EKS
         stage('Deploy to EKS') {
             steps {
-                // Make sure the AWS credential ID matches exactly ('aws login')
+               
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-login']]) {
                     sh '''
                         aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER} --alias ${EKS_CLUSTER}
@@ -80,7 +80,7 @@ pipeline {
 
     post {
         always {
-            cleanWs()  // Clean workspace after build
+            cleanWs() 
         }
     }
 }
