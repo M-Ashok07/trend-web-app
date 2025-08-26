@@ -56,19 +56,18 @@ pipeline {
         }
 
         stage('Deploy to EKS') {
-            steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws login']]) {
-                    sh """
-                        aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER} --alias ${EKS_CLUSTER}
-                        export KUBECONFIG=$HOME/.kube/config
-                        kubectl get nodes
-                        kubectl apply -f k8s/deployment.yaml --validate=false
-                        kubectl apply -f k8s/service.yaml --validate=false
-                    """
-                }
-            }
+    steps {
+        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-login']]) {
+            sh """
+                aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER} --alias ${EKS_CLUSTER}
+                export KUBECONFIG=$HOME/.kube/config
+                kubectl get nodes
+                kubectl apply -f k8s/deployment.yaml --validate=false
+                kubectl apply -f k8s/service.yaml --validate=false
+            """
         }
     }
+}
 
     post {
         always {
