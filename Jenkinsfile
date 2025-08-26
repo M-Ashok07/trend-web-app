@@ -5,6 +5,7 @@ pipeline {
     DOCKER_IMAGE = "trend-app"
     AWS_REGION   = "ap-south-1"
     EKS_CLUSTER  = "trend-eks"
+    KUBECONFIG = '/var/lib/jenkins/.kube/config'
   }
 
   triggers { githubPush() }
@@ -48,26 +49,17 @@ pipeline {
       }
     }
 
+    stages {
     stage('Deploy to EKS') {
-      steps {
-        // Patch image in deployment and apply manifests
-        sh '''
-          # Ensure manifests are present
-          test -f k8s/deployment.yaml
-          test -f k8s/service.yaml
-
-          # Update the image to the new tag
-          kubectl set image deployment/trend-frontend web=$DOCKER_IMAGE:$IMAGE_TAG --record || \
-          kubectl apply -f k8s/deployment.yaml
-
-          # Ensure service exists
-          kubectl apply -f k8s/service.yaml
-
-          kubectl rollout status deployment/trend-frontend
-        '''
-      }
+        steps {
+            sh '''
+                aws eks update-kubeconfig --region ap-south-1 --name trend-eks
+                kubectl get nodes
+                kubectl apply -f k8s/deployment.yaml
+            '''
+        }
     }
-  }
+}
 
   post {
     always {
