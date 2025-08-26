@@ -1,4 +1,4 @@
-
+O
 # Stage 1: Build the Vite app
 FROM node:20 AS build
 WORKDIR /app
