@@ -1,12 +1,17 @@
-# Terraform stuff
-.terraform/
-*.tfstate
-*.tfstate.*
-crash.log
-*.tfvars
+# Node modules and build artifacts
+node_modules
+dist
 
-.terraform/
-*.tfstate
-*.tfstate.*
-crash.log
-*.tfvars
+# Git files
+.git
+.gitignore
+
+# Logs
+*.log
+
+# AWS credentials / configs
+.aws
+
+# Infra scripts not needed for Docker build
+infra
+
